@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- site_build: 최신 확인 -->
+<meta name="build" content="edf69a641c87">
+<script>/* 예전 화면 방지 (site_build.py 가 관리 · 손으로 고치지 마세요): 서버의 최신 빌드와 다르면 한 번 새로 불러온다 */
+(function () {
+  var mine = document.querySelector('meta[name="build"]').content;
+  fetch("version.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (v) {
+    if (!v.build || v.build === mine) return;
+    var u = new URL(location.href);
+    if (u.searchParams.get("_b") === v.build) return;  // 새로 불렀는데도 다르면 반복하지 않는다
+    u.searchParams.set("_b", v.build);
+    location.replace(u.toString());
+  }).catch(function () {});
+})();
+</script>
+<title>{brand} · 사주 분석지</title>
+<meta name="description" content="생년월일만 넣으면 바로 보는 무료 사주표와 오늘의 운세, 그리고 정성껏 풀어 드리는 사주 분석지.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=b974501cd2">
+<script src="js/config.js?v=78c5e0f0bb"></script>
+<script src="vendor/lunar.js?v=9750324bfe"></script>
+<script src="js/saju-lite.js?v=ed687ce6ce"></script>
+<script src="js/site.js?v=39029ff7ec"></script>
+<script src="js/free.js?v=f0748419d6"></script>
+</head>
+<body>
+<div class="layout">
+<aside id="side" class="side"></aside>
+<div class="app">
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html" data-brand></a>
+  <a class="btn small" href="#products-section">분석지 주문</a>
+</div></header>
+
+<main>
+  <div class="hero wrap" style="padding:28px 16px 20px">
+    <div class="kicker">SAJU REPORT</div>
+    <h1 data-tagline></h1>
+    <p style="margin-bottom:0">생년월일만 넣으면 바로 보는 <b>무료 사주표</b>와 <b>오늘의 운세</b>. 더 깊은 이야기는 한 사람만을 위한 분석지로 받아 보세요.</p>
+  </div>
+
+  <section style="padding-top:0"><div class="wrap">
+    <nav class="menu" id="menu" aria-label="메뉴"></nav>
+  </div></section>
+
+  <section id="free" style="padding-top:8px"><div class="wrap">
+    <h2>무료 운세</h2>
+    <p class="sub">입력한 정보는 이 기기에만 저장되고, 어디에도 보내지 않습니다.</p>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="chart" aria-selected="true">내 사주표</button>
+        <button type="button" role="tab" data-tab="today" aria-selected="false">오늘의 운세</button>
+      </div>
+
+      <div id="f-profile" class="profile" hidden>
+        <span id="f-who"></span>
+        <button type="button" class="btn ghost" id="f-edit">바꾸기</button>
+        <button type="button" class="btn ghost" id="f-clear" aria-label="이 기기에서 내 정보 지우기">지우기</button>
+      </div>
+
+      <form id="f-form" novalidate>
+        <div class="wiz-top">
+          <button type="button" class="back" id="w-back" aria-label="이전 질문" hidden>‹</button>
+          <span>STEP <b id="w-no">1</b> / 4</span>
+        </div>
+        <div class="progress"><span id="w-bar"></span></div>
+
+        <div class="wiz-step" data-step="1">
+          <h3>어떤 이름으로<br>불러 드릴까요?</h3>
+          <label for="f-name">이름 <span class="hint">(별명도 좋아요)</span></label>
+          <input type="text" id="f-name" maxlength="20" autocomplete="name">
+        </div>
+        <div class="wiz-step" data-step="2" hidden>
+          <h3>성별을 알려 주세요</h3>
+          <div class="seg big">
+            <label><input type="radio" name="f-gender" value="여"><span>여성</span></label>
+            <label><input type="radio" name="f-gender" value="남"><span>남성</span></label>
+          </div>
+        </div>
+        <div class="wiz-step" data-step="3" hidden>
+          <h3>태어난 날은<br>언제인가요?</h3>
+          <div class="seg" style="margin-bottom:12px">
+            <label><input type="radio" name="f-cal" value="양력" checked><span>양력</span></label>
+            <label><input type="radio" name="f-cal" value="음력"><span>음력</span></label>
+            <label><input type="radio" name="f-cal" value="윤달"><span>음력 윤달</span></label>
+          </div>
+          <div class="row three date3" data-date="f"><select id="f-y" aria-label="년"></select><select id="f-m" aria-label="월"></select><select id="f-d" aria-label="일"></select></div>
+        </div>
+        <div class="wiz-step" data-step="4" hidden>
+          <h3>태어난 시간을<br>알고 계신가요?</h3>
+          <label for="f-time">태어난 시간</label>
+          <input type="time" id="f-time">
+          <label class="check" style="margin-top:10px"><input type="checkbox" id="f-unknown"> 태어난 시간을 몰라요</label>
+          <p class="hint" style="margin:6px 0 0">시간을 모르면 년·월·일 세 기둥으로 봅니다.</p>
+          <label for="f-place" style="margin-top:14px">태어난 곳 <span class="hint">(선택)</span></label>
+          <select id="f-place"></select>
+          <p class="hint" style="margin:6px 0 0">고르시면 그 지역의 해 뜨는 시각에 맞춰 출생 시간을 보정해, 시 경계 근처에 태어난 분은 더 정확해집니다.</p>
+        </div>
+
+        <div id="f-error" class="error" role="alert"></div>
+        <button class="btn" id="w-next" type="submit" style="width:100%;margin-top:16px">다음</button>
+      </form>
+      <div id="f-result" class="result" aria-live="polite"></div>
+    </div>
+  </div></section>
+
+  <section id="products-section"><div class="wrap">
+    <h2>사주 분석지</h2>
+    <p class="sub">만세력으로 정확히 계산한 사주를 바탕으로, 한 사람만을 위한 풀이를 PDF 분석지로 보내 드립니다.</p>
+    <div class="grid two" id="products"></div>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>받아 보시는 방법</h2>
+    <p class="sub">카드 결제 없이 계좌이체로 간단하게 진행됩니다.</p>
+    <ol class="steps">
+      <li><b>주문서 작성</b>생년월일과 받으실 이메일을 적어 주세요.</li>
+      <li><b>계좌이체</b>안내된 계좌로 입금해 주세요.</li>
+      <li><b>풀이 작성</b>입금 확인 후 사주를 풀어 분석지를 만듭니다.</li>
+      <li><b>이메일로 받기</b>24시간 안에 PDF 분석지를 보내 드립니다.</li>
+    </ol>
+  </div></section>
+
+  <section><div class="wrap">
+    <h2>자주 묻는 질문</h2>
+    <details><summary>태어난 시간을 모르는데 볼 수 있나요?</summary>
+      <p>네. 시간을 모르면 시주(태어난 시)를 빼고 년·월·일 세 기둥으로 풀어 드립니다. 자녀운·말년운처럼 시주에 기대는 부분은 조심스럽게 다룹니다.</p></details>
+    <details><summary>음력 생일만 알아요.</summary>
+      <p>음력으로 입력하시면 양력으로 바꿔 계산합니다. 윤달에 태어나셨다면 '음력 윤달'을 골라 주세요.</p></details>
+    <details><summary>얼마나 정확한가요?</summary>
+      <p>서머타임과 경도 보정까지 반영한 만세력으로 계산합니다. 태어난 곳을 고르시면 그 지역 경도로 보정해, 시가 바뀌는 경계 근처에 태어난 분은 더 정확해집니다. 풀이는 명리학 해석에 따른 참고 자료이며, 미래를 단정하지 않습니다.</p></details>
+    <details><summary>입력한 정보는 어디에 저장되나요?</summary>
+      <p>무료 메뉴에 넣은 이름·성별·생년월일은 지금 쓰시는 기기의 브라우저에만 저장되어, 다음에 오시거나 주문하실 때 다시 입력하지 않아도 됩니다. '지우기'를 누르면 바로 지워집니다.</p></details>
+    <details><summary>환불이 되나요?</summary>
+      <p>풀이 작성 전에는 전액 환불해 드립니다. 분석지를 보내 드린 뒤에는 디지털 콘텐츠 특성상 환불이 어렵습니다. 자세한 내용은 <a href="policy.html">환불 규정</a>을 확인해 주세요.</p></details>
+  </div></section>
+</main>
+
+<footer id="footer"></footer>
+<div class="bottombar"><a class="btn" id="bottom-cta" href="order.html"></a></div>
+</div>
+</div>
+</body>
+</html>

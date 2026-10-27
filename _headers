@@ -1,0 +1,7 @@
+# Netlify·Cloudflare Pages 용 캐시 규칙 (site_build.py 와 함께 예전 화면을 막는다)
+# 모든 파일: 쓰기 전에 서버에 바뀌었는지 반드시 물어본다
+/*
+  Cache-Control: no-cache
+# 최신 빌드 번호: 절대 저장하지 않는다
+/version.json
+  Cache-Control: no-store
