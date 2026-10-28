@@ -73,9 +73,11 @@
     const others = [y[0], y[1], m[0], h[0], h[1]].filter(ok).length >= 3;
     return STRENGTH[[ok(m[1]), ok(d[1]), others].map((b) => (b ? "T" : "F")).join("")];
   }
-  function yongsin(dayGan, label) {
+  // 신약 쪽이라도 관성(나를 극하는 오행)이 8글자 중 4개 이상이면 인성 — sinsal.py 와 같음
+  function yongsin(dayGan, label, elements) {
     const me = elemOf(dayGan);
-    const yong = label === "극신강" ? shift(me, 2) : ["중신강", "신강", "약변강"].includes(label) ? shift(me, 1) : me;
+    const yong = label === "극신강" ? shift(me, 2) : ["중신강", "신강", "약변강"].includes(label) ? shift(me, 1)
+      : elements[shift(me, -2)] >= 4 ? shift(me, -1) : me;
     const gi = shift(yong, -2);
     return { 용신: yong, 희신: shift(yong, -1), 기신: gi, 구신: shift(gi, -1) };
   }
@@ -114,7 +116,7 @@
       양력: iso(toSolar(ymd, 12, 0, cal)),
       음력: `${lunar.getYear()}년 ${lm < 0 ? "윤" : ""}${Math.abs(lm)}월 ${lunar.getDay()}일`,
       보정: notes, 일간: dayGan, 일간오행: elemOf(dayGan), 월지: pillars["월주"].간지[1],
-      원국: pillars, 오행: elements, 신강약: label, 용신: yongsin(dayGan, label),
+      원국: pillars, 오행: elements, 신강약: label, 용신: yongsin(dayGan, label, elements),
     };
   }
 

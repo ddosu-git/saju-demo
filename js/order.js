@@ -66,6 +66,10 @@
     $("#o-price").textContent = p ? SITE.won(p.price) : "";
     $("#o-dream-box").hidden = !p || p.id !== "해몽";
     $("#o-concern-box").hidden = !p || !TOPICS.includes(p.id);
+    const sits = (p && (shop.situations || {})[p.id]) || [];
+    $("#o-situation-box").hidden = !sits.length;
+    $("#o-situation").innerHTML = sits.map((s) =>
+      `<label class="check"><input type="radio" name="o-situation" value="${SITE.esc(s)}"> <span>${SITE.esc(s)}</span></label>`).join("");
     const fam = !!p && (p.id === "가족궁합" || p.id === "연애");
     $("#o-family-box").hidden = !fam;
     if (fam) {
@@ -97,6 +101,8 @@
     if (!birthOk(date, time, cal, place)) throw "생년월일을 다시 확인해 주세요. (음력·윤달은 실제로 있는 날짜만 됩니다)";
     const order = { id: orderId(), createdAt: new Date().toISOString(), product: p.id, price: p.price, name, gender, cal, date, time };
     if (place) order.place = place;
+    const sit = radio("o-situation");
+    if (sit && ((shop.situations || {})[p.id] || []).includes(sit)) order.situation = sit;
     if (TOPICS.includes(p.id) && $("#o-concern").value.trim()) order.concern = $("#o-concern").value.trim().slice(0, 500);
 
     if (p.id === "해몽") {
@@ -140,6 +146,11 @@
       body: JSON.stringify({ action: "order", order }) });
   }
 
+  function followupText() {
+    const f = shop.followup;
+    return f ? `💌 분석지를 받으신 뒤 궁금한 점 <b>1가지</b>는 받으신 메일에 답장으로 보내 주시면 무료로 답해 드립니다. (받으신 날부터 ${f.days}일 안)` : "";
+  }
+
   function showDone(order) {
     const p = shop.products.find((x) => x.id === order.product);
     const due = new Date(new Date(order.createdAt).getTime() + shop.depositHours * 3600e3);
@@ -159,6 +170,7 @@
         <div>입금자명 <b>${SITE.esc(order.depositor)}</b></div>
         <div class="hint">${due.getMonth() + 1}월 ${due.getDate()}일 ${due.getHours()}시까지 입금이 없으면 주문이 취소됩니다.</div>
       </div>
+      ${followupText() ? `<div class="notice" style="margin-top:14px">${followupText()}</div>` : ""}
       <div class="notice" style="margin-top:14px">이 화면을 캡처해 두시면 편합니다. 주문 내용을 바꾸고 싶으시면 주문번호와 함께 문의해 주세요.</div>
       <p style="margin-top:18px"><a class="btn ghost" href="index.html">처음으로</a></p>`;
     $("#copy-acc").addEventListener("click", async (e) => {
@@ -169,6 +181,7 @@
 
   function init() {
     $("#testbanner").hidden = !!shop.orderEndpoint;
+    if (followupText()) { $("#o-followup").innerHTML = followupText(); $("#o-followup").hidden = false; }
     const want = new URLSearchParams(location.search).get("p");
     renderProducts(shop.products.some((p) => p.id === want) ? want : "");
     document.querySelectorAll("input[name=o-product]").forEach((r) => r.addEventListener("change", onProductChange));
